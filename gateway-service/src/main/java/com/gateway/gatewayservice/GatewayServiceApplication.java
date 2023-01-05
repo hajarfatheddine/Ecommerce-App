@@ -15,16 +15,6 @@ public class GatewayServiceApplication {
 		SpringApplication.run(GatewayServiceApplication.class, args);
 	}
 
-	//@Bean
-    /* RouteLocator routeLocator(RouteLocatorBuilder builder){
-        return builder.routes()
-                .route((r)->r.path("/customers/**").uri("lb://CUSTOMER-SERVICE"))
-                .route((r)->r.path("/products/**").uri("lb://PRODUCT-SERVICE"))
-                .build();
-    }
-    */
-
-	// à chaque fois ce service recoit une requete regarde l'URL c'est la où tu va trouver le nom du microservice
 	@Bean
 	DiscoveryClientRouteDefinitionLocator definitionLocator(ReactiveDiscoveryClient discoveryClient, DiscoveryLocatorProperties properties){
 		return new DiscoveryClientRouteDefinitionLocator(discoveryClient,properties);
