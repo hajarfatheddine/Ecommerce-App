@@ -13,7 +13,6 @@ import {SecurityService} from "../../services/security.service";
    public async ngOnInit() {
 
    }
-
    onLogout() {
      this.securityService.kcService.logout(window.location.origin);
    }

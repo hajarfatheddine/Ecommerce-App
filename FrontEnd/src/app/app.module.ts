@@ -12,7 +12,6 @@ import { BillDetailsComponent } from './components/bill-details/bill-details.com
 import {KeycloakAngularModule, KeycloakService} from "keycloak-angular";
 import {NavbarComponent} from "./components/navbar/navbar.component";
 
-
 export function kcFactory(kcService:KeycloakService){
   return()=>{
     kcService.init({
@@ -37,13 +36,12 @@ export function kcFactory(kcService:KeycloakService){
     BillsComponent,
     BillDetailsComponent,
     NavbarComponent,
-
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    KeycloakAngularModule
+    KeycloakAngularModule,
   ],
   providers: [
     {
