@@ -109,6 +109,8 @@ The user can also view the bill details, meaning the list of products purchased,
 ## III- SECURITY USING KEYCLOAK
 
 Keycloak is an open source **identity and access management** solution.
+
+###  a. Setting Up a Keycloak Server
 To be able to use it to secure our application, we must configure it.
 To do so:
 - we created a realm called **"Ecom-realm"**, and added the clients which are the applications to secure.
@@ -121,8 +123,58 @@ To do so:
 
 - we added the different roles that we need and assign them to each corresponding user.
 
-![image](https://user-images.githubusercontent.com/84817425/209444690-9ceaf678-8c88-4e7d-a67d-b316e8ae1ca5.png)
+![Capture d’écran (315)](https://user-images.githubusercontent.com/84817425/210899346-64849336-6b10-47f5-851f-e10d59bfb5fb.png)
 
+#### Testing the different authentication modes using Postman
+##### Using the access token 
+To do so:
 
+- We made a POST request to the token endpoint of the Keycloak server. <http://localhost:8080/realms/Ecom-realm/protocol/openid-connect/token>
+- In the "Body" tab, we selected the "x-www-form-urlencoded" option, and then we added the following key-value pairs to the request:
+   - "username".
+   - "password".
+   - "grant_type": password
+   - "client_id": (The client ID of your application)
+
+![Capture d’écran (317)](https://user-images.githubusercontent.com/84817425/210899597-80a1d7d6-840f-40c5-ac61-c80769afcf09.png)
+
+##### Using the refresh token
+To do so:
+
+1. We made a POST request to the token endpoint of the Keycloak server. <http://localhost:8080/realms/Ecom-realm/protocol/openid-connect/token>
+2. In the "Body" tab, we selected the "x-www-form-urlencoded" option, and then we added the following key-value pairs to the request:
+   - "username".
+   - "password".
+   - "grant_type": refresh_token
+   - "refresh_token": (the refresh tokent to refresh/retrieve a new the access token)
+
+![Capture d’écran (321)](https://user-images.githubusercontent.com/84817425/210899660-628693e3-8d04-4a09-9aed-1922c200d1bf.png)
+
+### b. Securing the microservices
+To secure each microservices we took the following steps:
+1. we added the following dependencies in pom.xml
+```xml		
+<dependency> 
+    <groupId>org.keycloak</groupId>
+    <artifactId>keycloak-spring-boot-starter</artifactId>
+    <version>20.0.1</version>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>		
+    <version>2.7.7</version>
+</dependency>
+```
+2. we added keycloak configuration in application.properties :
+```
+keycloak.realm=Ecom-realm
+keycloak.resource=EcommerceApp
+keycloak.bearer-only=true
+keycloak.auth-server-url=http://localhost:8080
+keycloak.ssl-required=none
+```
+3. We then added configuration classes inside of the **`security`** package.
+   We created **`KeycloakSecurityConfig`** class to configure the security settings for our application that is protected by Keycloak.
+   We then created the **`KeycloakAdapterConfig`** class to easily integrate Keycloak with our application.
 
 
