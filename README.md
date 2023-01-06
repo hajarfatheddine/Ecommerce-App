@@ -14,7 +14,7 @@ It contains five microservices in total. Three functional microservices and 2 te
     - inventory-service
     - billing-service
 
-![image](https://user-images.githubusercontent.com/84817425/209443380-5b117372-91bc-41e2-9031-c8d262244f73.png)
+![image](https://user-images.githubusercontent.com/84817425/211057927-0bf3f00e-8234-49ac-95c6-b9ead7a82008.png)
 
 ## 1. Eureka discovery
 It is a registration service that allows services to find and communicate with each other without hard-coding the hostname and port.
@@ -146,13 +146,14 @@ To do so:
    - "username".
    - "password".
    - "grant_type": refresh_token
-   - "refresh_token": (the refresh tokent to refresh/retrieve a new the access token)
+   - "refresh_token": (the refresh token to refresh/retrieve a new the access token)
 
 ![Capture d’écran (321)](https://user-images.githubusercontent.com/84817425/210899660-628693e3-8d04-4a09-9aed-1922c200d1bf.png)
 
 ### b. Securing the microservices
+
 To secure each microservices we took the following steps:
-1. we added the following dependencies in pom.xml
+1. we added the following dependencies in **`pom.xml`**
 ```xml		
 <dependency> 
     <groupId>org.keycloak</groupId>
@@ -165,7 +166,7 @@ To secure each microservices we took the following steps:
     <version>2.7.7</version>
 </dependency>
 ```
-2. we added keycloak configuration in application.properties :
+2. we added keycloak configuration in **`application.properties`** :
 ```
 keycloak.realm=Ecom-realm
 keycloak.resource=EcommerceApp
@@ -212,6 +213,7 @@ Because the current user is a CUSTOMER and not an ADMIN, his request is denied.
 ![Capture d’écran (324)](https://user-images.githubusercontent.com/84817425/211002386-47f179bd-f876-4a4b-8625-e18c171a2385.png)
 
 ### c. Securing the frontEnd
+
 To do so, we followed the following steps:
 1. We installed the following packages:
 ```cmd
@@ -270,7 +272,7 @@ export function kcFactory(kcService:KeycloakService){
 })
 export class AppModule { }
 ```
-3. we added the "AuthGard" class:
+3. next, we added the "AuthGard" class:
 ```typescript
 import { Injectable } from '@angular/core';
 import {
@@ -347,7 +349,32 @@ export class SecurityService{
   }
 }
 ```
-This service contains a method to set up and load the user profile and another one to check whether a user has the any of the roles passed to the method as an argument. 
+This service contains a method to set up and load the user profile and another one to check whether a user has  any of the roles passed to the method as an argument. 
 
 ---
+The next step that we took is adding the Login/Logout options in the navbar:
+
+![Capture d’écran (331)](https://user-images.githubusercontent.com/84817425/211051879-0b2df5b7-7ac2-44be-b228-52d28bc4cc89.png)
+
+As you may notice, the products & customers elements that were previously visible are not now until the user is authenticated.
+
+![Capture d’écran (340)](https://user-images.githubusercontent.com/84817425/211056770-65688d50-ab68-4e7b-9660-9b892178a6b6.png)
+
+Once the user is authenticated, the navbar look something like this:
+
+![Capture d’écran (337)](https://user-images.githubusercontent.com/84817425/211053109-059c3003-04c6-40e7-93fc-7f8fdadea16f.png)
+
+The user with the role **"ADMIN"** can view both the list of customers as well as the list of products:
+ 
+![Capture d’écran 2023-01-06 172910](https://user-images.githubusercontent.com/84817425/211055135-60b1136e-ae6a-452f-a780-de515e533616.png)
+ 
+The user with the role **"CUSTOMER"** can only view the list of products for now:
+
+![Capture d’écran (338)](https://user-images.githubusercontent.com/84817425/211054489-ed611b4e-b8fe-4131-98be-0d201a3c639a.png)
+
+
+ 
+
+ 
+ 
 
