@@ -115,7 +115,7 @@ To be able to use it to secure our application, we must configure it.
 To do so:
 - we created a realm called **"Ecom-realm"**, and added the clients which are the applications to secure.
 
-![image](https://user-images.githubusercontent.com/84817425/209444585-b6b7f5a6-ab0c-4800-a847-2a77ff25ae8e.png)
+![Capture d’écran (325)](https://user-images.githubusercontent.com/84817425/211005467-0e6e0979-3ba7-4450-9255-01cba6462c9b.png)
 
 - we added the different users.
 
@@ -174,7 +174,180 @@ keycloak.auth-server-url=http://localhost:8080
 keycloak.ssl-required=none
 ```
 3. We then added configuration classes inside of the **`security`** package.
-   We created **`KeycloakSecurityConfig`** class to configure the security settings for our application that is protected by Keycloak.
-   We then created the **`KeycloakAdapterConfig`** class to easily integrate Keycloak with our application.
+  - We created the **`KeycloakAdapterConfig`** class to easily integrate Keycloak with our application.
+ ```java 
+ @Configuration
+public class KeycloakAdapterConfig {
+    @Bean
+    KeycloakSpringBootConfigResolver springBootConfigResolver(){
+        return new KeycloakSpringBootConfigResolver();
+    }
+}
+ ```
+ - We created **`KeycloakSecurityConfig`** class to configure the security settings for our application that is protected by Keycloak. In this class we did override the configure(HttpSecurity) method to specify the security constraints for our application. 
+For example: 
+ ```java
+@Override
+    protected void configure(HttpSecurity http) throws Exception {
+        super.configure(http);
+        http.csrf().disable();
+        http.authorizeRequests().antMatchers("/customers/{id}").permitAll();
+        http.authorizeRequests().antMatchers("/customers").hasAuthority("ADMIN");
+        http.headers().frameOptions().disable();
+        http.authorizeRequests().anyRequest().authenticated();
 
+    }
+ ```
+ In this example, everyone has the right to access the endpoint **"/customers/{id}"**, and only the user with the role **"ADMIN"** can access the customers list.
+ 
+ To test this, we sent the following requests with the access token of a user with the role **"CUSTOMER"** using postman: 
+ <http://localhost:8888/CUSTOMER-SERVICE/customers>
+
+![Capture d’écran (322)](https://user-images.githubusercontent.com/84817425/211001992-9c45e908-54fa-4d53-9a56-c87d58ccbfce.png)
+
+Because the current user is a CUSTOMER and not an ADMIN, his request is denied.
+
+<http://localhost:8888/CUSTOMER-SERVICE/customers/1>
+
+![Capture d’écran (324)](https://user-images.githubusercontent.com/84817425/211002386-47f179bd-f876-4a4b-8625-e18c171a2385.png)
+
+### c. Securing the frontEnd
+To do so, we followed the following steps:
+1. We installed the following packages:
+```cmd
+npm install keycloak-js keycloak-angular
+```
+The keycloak-js and keycloak-angular packages are libraries that provide integration between Keycloak and JavaScript or Angular applications.
+
+2. We then did set up the keycloak service in the **AppModule**.
+```typescript
+import {APP_INITIALIZER, NgModule} from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+...
+import {KeycloakAngularModule, KeycloakService} from "keycloak-angular";
+import {NavbarComponent} from "./components/navbar/navbar.component";
+
+export function kcFactory(kcService:KeycloakService){
+  return()=>{
+    kcService.init({
+      config:{
+        realm:"Ecom-realm",
+        clientId:"EcommerceApp",
+        url:"http://localhost:8080"
+      },
+      initOptions:{
+        onLoad: "check-sso",
+        checkLoginIframe:true
+      }
+    })
+  }
+}
+@NgModule({
+  declarations: [
+    AppComponent,
+    ProductsComponent,
+    CustomersComponent,
+    AccountDetailsComponent,
+    BillsComponent,
+    BillDetailsComponent,
+    NavbarComponent,
+
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    HttpClientModule,
+    KeycloakAngularModule
+  ],
+  providers: [
+    {
+      provide: APP_INITIALIZER,
+      deps:[KeycloakService],
+      useFactory:kcFactory,
+      multi: true}
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+3. we added the "AuthGard" class:
+```typescript
+import { Injectable } from '@angular/core';
+import {
+  ActivatedRouteSnapshot,
+  Router,
+  RouterStateSnapshot
+} from '@angular/router';
+import { KeycloakAuthGuard, KeycloakService } from 'keycloak-angular';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthGuard extends KeycloakAuthGuard {
+  constructor(
+    protected override readonly router: Router,
+    protected readonly keycloak: KeycloakService
+  ) {
+    super(router, keycloak);
+  }
+  public async isAccessAllowed(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ) {
+    // Force the user to log in if currently unauthenticated.
+    if (!this.authenticated) {
+      await this.keycloak.login({
+        redirectUri: window.location.origin + state.url
+      });
+    }
+
+    // Get the roles required from the route.
+    const requiredRoles = route.data["roles"];
+
+    // Allow the user to proceed if no additional roles are required to access the route.
+    if (!(requiredRoles instanceof Array) || requiredRoles.length === 0) {
+      return true;
+    }
+
+    // Allow the user to proceed if all the required roles are present.
+    return requiredRoles.every((role) => this.roles.includes(role));
+  }
+}
+```
+the AuthGuard is a class that implements the **CanActivate** interface from the Angular router. It is used to protect routes in an Angular application, allowing only authenticated users to access certain routes.
+
+4. we did set up a security service :
+```typescript
+import {Injectable} from "@angular/core";
+import {KeycloakProfile} from "keycloak-js";
+import {KeycloakEventType, KeycloakService} from "keycloak-angular";
+
+@Injectable({providedIn: "root"})
+export class SecurityService{
+  public profile? : KeycloakProfile;
+  constructor(public kcService: KeycloakService) {
+    this.init();
+  }
+  init(){
+    this.kcService.keycloakEvents$.subscribe({
+      next:(e)=>{
+        if(e.type== KeycloakEventType.OnAuthSuccess){
+          this.kcService.loadUserProfile().then(profile=>{
+            this.profile=profile;
+          });
+        }
+      }
+    });
+  }
+  public hasRoleIn(roles: string[]):boolean{
+    let userRoles=this.kcService.getUserRoles();
+    for(let role of roles){
+      if(userRoles.includes(role)) return true;
+    }return false;
+  }
+}
+```
+This service contains a method to set up and load the user profile and another one to check whether a user has the any of the roles passed to the method as an argument. 
+
+---
 
