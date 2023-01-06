@@ -1,0 +1,40 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#"><i class="bi bi-bag-check-fill color"></i><b> Ecommerce</b></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Home</a>
+        </li>
+        <li class="nav-item" >
+          <a class="nav-link" routerLink="/products" *ngIf="securityService.hasRoleIn(['ADMIN','CUSTOMER'])">Products</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/customers" *ngIf="securityService.hasRoleIn(['ADMIN'])">Customers</a>
+        </li>
+      </ul>
+      <ul class="navbar-nav float-end">
+        <li class="nav-item">
+          <a class="nav-link" *ngIf="securityService.profile; else loginTemplate" >
+            <a><strong class="d-none d-sm-block ms-1">{{securityService.profile.firstName}}</strong></a>
+          </a>
+          <ng-template #loginTemplate>
+            <a class="nav-link"aria-current="page" (click)="login()"><i class="fa-solid fa-arrow-right-to-bracket color"></i><b>  Login</b></a>
+          </ng-template>
+        </li>
+        <li class="nav-item dropdown" *ngIf="securityService.profile">
+          <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-chevron-circle-down fa-lg color"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink" >
+            <li><a class="dropdown-item placement" (click)="onLogout()" >Logout  <i class="fas fa-regular fa-arrow-right-from-bracket"></i></a></li>
+          </ul>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
