@@ -385,16 +385,18 @@ The user with the role **"CUSTOMER"** can only view the list of products for now
 ## PART TWO
 ## 1. kafka integration
 
-Dowloading kafka: <https://kafka.apache.org/downloads>
-Starting kafka:
+**Dowloading kafka**: <https://kafka.apache.org/downloads>
+
+**Starting kafka**:
+
 To start Kafka, here is the list of the command needed to run in the commad line:
 
-To start the zookeeper, I ran the following commands:
+- To start the zookeeper, I ran the following commands:
 `````
 cd C:/Tools/kafka
 start bin\windows\zookeeper-server-start.bat config/zookeeper.properties
 `````
-To start the kafka server, I ran the following command:
+- To start the kafka server, I ran the following command:
 ````
 start bin\windows\kafka-server-start.bat config/server.properties
 ````
