@@ -1,21 +1,31 @@
-# Ecommerce-Application
+# Ecommerce-Application-Project
 
-This repository contains two part:
-- **The backend**
-- **The frontend**
-
-## I- THE BACKEND
-It contains five microservices in total. Three functional microservices and 2 technical microservices.
-- **Functional microservices:**
+This repository contains seven microservices in total. Four functional microservices and three technical microservices.
+- **Technical microservices:**
     - eureka-discovery
     - gateway service
-- **Technical microservices:**
+    - authentication-service
+- **Functional microservices:**
     - customer-service
     - inventory-service
     - billing-service
+    - kafka-service
+    
+This project was divided into Two parts:
+- The first part covered the creation and implementation of:
+      **eureka-discovery
+      - gateway service
+      - authentication-service 
+      - customer-service
+      - inventory-service
+      - billing-service.**
+      
+- The second part focused on the creation and implementation of : **kafka-service**
 
-![image](https://user-images.githubusercontent.com/84817425/211057927-0bf3f00e-8234-49ac-95c6-b9ead7a82008.png)
+![image](https://user-images.githubusercontent.com/84817425/213583740-4b9b32a5-47b5-4938-bb56-d78c01443868.png)
 
+## PART ONE
+## I- THE BACKEND
 ## 1. Eureka discovery
 It is a registration service that allows services to find and communicate with each other without hard-coding the hostname and port.
 It contains all the addresses of the microservices.
@@ -372,9 +382,34 @@ The user with the role **"CUSTOMER"** can only view the list of products for now
 
 ![Capture d’écran (338)](https://user-images.githubusercontent.com/84817425/211054489-ed611b4e-b8fe-4131-98be-0d201a3c639a.png)
 
+## PART TWO
+## 1. kafka integration
 
- 
+Dowloading kafka: <https://kafka.apache.org/downloads>
+Starting kafka:
+To start Kafka, here is the list of the command needed to run in the commad line:
 
- 
+To start the zookeeper, I ran the following commands:
+`````
+cd C:/Tools/kafka
+start bin\windows\zookeeper-server-start.bat config/zookeeper.properties
+`````
+To start the kafka server, I ran the following command:
+````
+start bin\windows\kafka-server-start.bat config/server.properties
+````
+## 2. kafka microservice creation
+
+**`kafka-service`** Is a microservice that randomly produce invoices and publish them in a KAFKA topic.
+the steps followed to implement it are:
+- Adding the following dependencies:
+    - lombok
+    - spring web
+    - spring for apache kafka
+    - spring for apache kafka streams
+    - cloud stream
+
+- Creating the **`Bill`** class
+- Creating the **`BillsSupplierService.java`** to produce and send bills to a kafka topic. 
  
 
