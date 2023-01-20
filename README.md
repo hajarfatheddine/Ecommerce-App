@@ -1,21 +1,38 @@
-# Ecommerce-Application
+# Ecommerce-Application-Project
 
-This repository contains two part:
-- **The backend**
-- **The frontend**
+This repository contains all the components that make the Ecommerce App.
 
-## I- THE BACKEND
-It contains five microservices in total. Three functional microservices and 2 technical microservices.
-- **Functional microservices:**
+#### The backEnd section:
+- **Technical microservices:**
     - eureka-discovery
     - gateway service
-- **Technical microservices:**
+    - authentication-service
+- **Functional microservices:**
     - customer-service
     - inventory-service
     - billing-service
+    - billing-supplier-service
+    - kafka-stream-data-analytics
+    
+#### The FrontEnd section:
+- Angular client
+- data analytics front
 
-![image](https://user-images.githubusercontent.com/84817425/211057927-0bf3f00e-8234-49ac-95c6-b9ead7a82008.png)
+This project was divided into Two parts:
+- The first part covered the creation and implementation of:
+      **eureka-discovery
+      - gateway service
+      - authentication-service 
+      - customer-service
+      - inventory-service
+      - billing-service.**
+      
+- The second part focused on the creation and implementation of : **billing-supplier-service - kafka streams data analytics**
 
+![image](https://user-images.githubusercontent.com/84817425/213583740-4b9b32a5-47b5-4938-bb56-d78c01443868.png)
+
+## PART ONE
+## I- THE BACKEND
 ## 1. Eureka discovery
 It is a registration service that allows services to find and communicate with each other without hard-coding the hostname and port.
 It contains all the addresses of the microservices.
@@ -372,9 +389,58 @@ The user with the role **"CUSTOMER"** can only view the list of products for now
 
 ![Capture d’écran (338)](https://user-images.githubusercontent.com/84817425/211054489-ed611b4e-b8fe-4131-98be-0d201a3c639a.png)
 
+## PART TWO
+## 1. kafka integration
 
- 
+**Dowloading kafka**: <https://kafka.apache.org/downloads>
 
- 
- 
+**Starting kafka**:
+
+To start Kafka, here is the list of the command needed to run in the commad line:
+
+- To start the zookeeper, I ran the following commands:
+`````
+cd C:/Tools/kafka
+start bin\windows\zookeeper-server-start.bat config/zookeeper.properties
+`````
+- To start the kafka server, I ran the following command:
+````
+start bin\windows\kafka-server-start.bat config/server.properties
+````
+## 2. billing-supplier-service
+
+**`billing-supplier-service`** Is a microservice that randomly produce invoices and publish them in a KAFKA topic.
+The steps followed to implement it are:
+- Adding the following dependencies:
+    - lombok
+    - spring web
+    - spring for apache kafka
+    - spring for apache kafka streams
+    - cloud stream
+
+- Creating the **`Bill`** class
+- Creating the **`ProductItem`** class
+- Creating the **`BillSupplier`** in **`BillsSupplierService.java`** to randomly produce and send bills to the R5 topic. 
+- Adding the following configuration in `application.properties`to set the destination for sending messages:
+```
+spring.cloud.stream.bindings.billSupplier-out-0.destination=R5
+spring.cloud.function.definition=billSupplier;
+spring.cloud.stream.poller.fixed-delay=3000
+```
+- Creating the **`BillConsymer`** in **`BillService.java`** in the **`billing-service`** to receive the bills and save them to the database.
+- Adding the following configuration in `application.properties`to set the destination for sending messages:
+```
+spring.cloud.stream.bindings.billsConsumer-in-0.destination=R5
+spring.cloud.function.definition=billsConsumer
+```
+
+ To test this, I executed the following command:
+ ```
+ > start bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic R5
+ ```
+This resulted in:
+
+![image](https://user-images.githubusercontent.com/84817425/213742181-311f876b-ab23-4aa6-b089-1ee335dba83a.png)
+
+![image](https://user-images.githubusercontent.com/84817425/213743141-bf007857-ff35-43c6-baee-e1e4da82dd85.png)
 
