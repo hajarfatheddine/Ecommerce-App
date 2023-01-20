@@ -410,7 +410,7 @@ start bin\windows\kafka-server-start.bat config/server.properties
 ## 2. billing-supplier-service
 
 **`billing-supplier-service`** Is a microservice that randomly produce invoices and publish them in a KAFKA topic.
-the steps followed to implement it are:
+The steps followed to implement it are:
 - Adding the following dependencies:
     - lombok
     - spring web
@@ -420,6 +420,27 @@ the steps followed to implement it are:
 
 - Creating the **`Bill`** class
 - Creating the **`ProductItem`** class
-- Creating the **`BillsSupplierService.java`** to produce and send bills to a kafka topic. 
- 
+- Creating the **`BillSupplier`** in **`BillsSupplierService.java`** to randomly produce and send bills to the R5 topic. 
+- Adding the following configuration in `application.properties`to set the destination for sending messages:
+```
+spring.cloud.stream.bindings.billSupplier-out-0.destination=R5
+spring.cloud.function.definition=billSupplier;
+spring.cloud.stream.poller.fixed-delay=3000
+```
+- Creating the **`BillConsymer`** in **`BillService.java`** in the **`billing-service`** to receive the bills and save them to the database.
+- Adding the following configuration in `application.properties`to set the destination for sending messages:
+```
+spring.cloud.stream.bindings.billsConsumer-in-0.destination=R5
+spring.cloud.function.definition=billsConsumer
+```
+
+ To test this, I executed the following command:
+ ```
+ > start bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic R5
+ ```
+This resulted in:
+
+![image](https://user-images.githubusercontent.com/84817425/213742181-311f876b-ab23-4aa6-b089-1ee335dba83a.png)
+
+![image](https://user-images.githubusercontent.com/84817425/213743141-bf007857-ff35-43c6-baee-e1e4da82dd85.png)
 
