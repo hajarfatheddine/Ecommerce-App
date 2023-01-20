@@ -1,6 +1,8 @@
 # Ecommerce-Application-Project
 
-This repository contains seven microservices in total. Four functional microservices and three technical microservices.
+This repository contains all the components that make the Ecommerce App.
+
+#### The backEnd section:
 - **Technical microservices:**
     - eureka-discovery
     - gateway service
@@ -9,8 +11,13 @@ This repository contains seven microservices in total. Four functional microserv
     - customer-service
     - inventory-service
     - billing-service
-    - kafka-service
+    - billing-supplier-service
+    - kafka-stream-data-analytics
     
+#### The FrontEnd section:
+- Angular client
+- data analytics front
+
 This project was divided into Two parts:
 - The first part covered the creation and implementation of:
       **eureka-discovery
@@ -20,7 +27,7 @@ This project was divided into Two parts:
       - inventory-service
       - billing-service.**
       
-- The second part focused on the creation and implementation of : **kafka-service**
+- The second part focused on the creation and implementation of : **billing-supplier-service - kafka streams data analytics**
 
 ![image](https://user-images.githubusercontent.com/84817425/213583740-4b9b32a5-47b5-4938-bb56-d78c01443868.png)
 
@@ -400,9 +407,9 @@ start bin\windows\zookeeper-server-start.bat config/zookeeper.properties
 ````
 start bin\windows\kafka-server-start.bat config/server.properties
 ````
-## 2. kafka microservice creation
+## 2. billing-supplier-service
 
-**`kafka-service`** Is a microservice that randomly produce invoices and publish them in a KAFKA topic.
+**`billing-supplier-service`** Is a microservice that randomly produce invoices and publish them in a KAFKA topic.
 the steps followed to implement it are:
 - Adding the following dependencies:
     - lombok
@@ -412,6 +419,7 @@ the steps followed to implement it are:
     - cloud stream
 
 - Creating the **`Bill`** class
+- Creating the **`ProductItem`** class
 - Creating the **`BillsSupplierService.java`** to produce and send bills to a kafka topic. 
  
 
