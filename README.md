@@ -209,23 +209,20 @@ For example:
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
         http.csrf().disable();
-        http.authorizeRequests().antMatchers("/customers/{id}").permitAll();
+        http.authorizeRequests().antMatchers("/customers/{id}").hasAuthority("ADMIN");
         http.authorizeRequests().antMatchers("/customers").hasAuthority("ADMIN");
         http.headers().frameOptions().disable();
         http.authorizeRequests().anyRequest().authenticated();
 
     }
  ```
- In this example, everyone has the right to access the endpoint **"/customers/{id}"**, and only the user with the role **"ADMIN"** can access the customers list.
+In this example, only the user with the role **"ADMIN"** has the right to access the endpoints **"/customers/{id}"** and **"/customers"**.
  
- To test this, we sent the following requests with the access token of a user with the role **"CUSTOMER"** using postman: 
- <http://localhost:8888/CUSTOMER-SERVICE/customers>
-
-![Capture d’écran (322)](https://user-images.githubusercontent.com/84817425/211001992-9c45e908-54fa-4d53-9a56-c87d58ccbfce.png)
-
-Because the current user is a CUSTOMER and not an ADMIN, his request is denied.
+To test this, we sent the following request with the access token of a user with the role **"CUSTOMER"** using postman: 
 
 <http://localhost:8888/CUSTOMER-SERVICE/customers/1>
+
+Because the current user is a CUSTOMER and not an ADMIN, his request is denied.
 
 ![Capture d’écran (324)](https://user-images.githubusercontent.com/84817425/211002386-47f179bd-f876-4a4b-8625-e18c171a2385.png)
 
