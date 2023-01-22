@@ -218,11 +218,11 @@ For example:
  ```
 In this example, only the user with the role **"ADMIN"** has the right to access the endpoints **"/customers/{id}"** and **"/customers"**.
  
-To test this, we sent the following requests with the access token of a user with the role **"CUSTOMER"** using postman: 
-
-Because the current user is a CUSTOMER and not an ADMIN, his request is denied.
+To test this, we sent the following request with the access token of a user with the role **"CUSTOMER"** using postman: 
 
 <http://localhost:8888/CUSTOMER-SERVICE/customers/1>
+
+Because the current user is a CUSTOMER and not an ADMIN, his request is denied.
 
 ![Capture d’écran (324)](https://user-images.githubusercontent.com/84817425/211002386-47f179bd-f876-4a4b-8625-e18c171a2385.png)
 
