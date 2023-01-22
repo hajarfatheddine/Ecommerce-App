@@ -27,7 +27,7 @@ This project was divided into Two parts:
       - inventory-service
       - billing-service.**
       
-- The second part focused on the creation and implementation of : **billing-supplier-service - kafka streams data analytics**
+- The second part focused on the creation and implementation of : **billing-supplier-service - kafka streams data analytics - data analytics front**
 
 ![image](https://user-images.githubusercontent.com/84817425/213583740-4b9b32a5-47b5-4938-bb56-d78c01443868.png)
 
@@ -411,7 +411,7 @@ start bin\windows\kafka-server-start.bat config/server.properties
 
 **`billing-supplier-service`** Is a microservice that randomly produce invoices and publish them in a KAFKA topic.
 The steps followed to implement it are:
-- Adding the following dependencies:
+- Creating a spring boot project with the following dependencies:
     - lombok
     - spring web
     - spring for apache kafka
@@ -423,20 +423,23 @@ The steps followed to implement it are:
 - Creating the **`BillSupplier`** in **`BillsSupplierService.java`** to randomly produce and send bills to the R5 topic. 
 - Adding the following configuration in `application.properties`to set the destination for sending messages:
 ```
-spring.cloud.stream.bindings.billSupplier-out-0.destination=R5
+server.port=9081
+spring.cloud.stream.bindings.billSupplier-out-0.destination=R4
 spring.cloud.function.definition=billSupplier;
-spring.cloud.stream.poller.fixed-delay=3000
+spring.cloud.stream.poller.fixed-delay=300
+spring.cloud.discovery.enabled=true
+spring.application.name=billing-supplier-service
 ```
-- Creating the **`BillConsymer`** in **`BillService.java`** in the **`billing-service`** to receive the bills and save them to the database.
+- Creating the **`BillConsumer`** in **`BillService.java`** in the **`billing-service`** to receive the bills and save them to the database.
 - Adding the following configuration in `application.properties`to set the destination for sending messages:
 ```
-spring.cloud.stream.bindings.billsConsumer-in-0.destination=R5
+spring.cloud.stream.bindings.billsConsumer-in-0.destination=R4
 spring.cloud.function.definition=billsConsumer
 ```
 
  To test this, I executed the following command:
  ```
- > start bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic R5
+ > start bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic R4
  ```
 This resulted in:
 
@@ -444,3 +447,84 @@ This resulted in:
 
 ![image](https://user-images.githubusercontent.com/84817425/213743141-bf007857-ff35-43c6-baee-e1e4da82dd85.png)
 
+
+## 3. data-analytics-service
+This microservice receives the created bills from the **`billing-supplier-service`** and displays in real time the number of bills "PAID" and "PENDING" in an interval of time.
+
+The steps followed to implement it are:
+- Creating a spring boot project with the following dependencies:
+    - lombok
+    - spring web
+    - spring for apache kafka
+    - spring for apache kafka streams
+    - cloud stream
+
+- Creating the **`Bill`** class
+- Creating the **`ProductItem`** class
+- Creating the **`kStreamFunction`** function in **`BillService.java`**.This function applies a series of operations on the input stream and returns a new KStream with the updated values. These results are materialized as "bill-count".
+- Creating the **`analytics`** function in **`BillAnalyticsController.java`**.This function retrieves all the key-value pairs in the "bill-count" store between the time range of now and 10 seconds ago.
+- Adding the following configuration in `application.properties` to set the destination for sending messages:
+```
+server.port=9082
+spring.cloud.discovery.enabled=true
+spring.application.name=data-analytics-service
+spring.cloud.function.definition=kStreamFunction
+spring.cloud.stream.bindings.kStreamFunction-in-0.destination=R4
+spring.cloud.stream.bindings.kStreamFunction-out-0.destination=R5
+spring.cloud.stream.kafka.streams.binder.configuration.commit.interval.ms=5000
+```
+This resulted in:
+
+![image](https://user-images.githubusercontent.com/84817425/213911087-a6d63241-eff7-4905-9c33-611660e7b57b.png)
+
+## 4. data analytics front
+To so, I created an html file to display Stream Data Analytics results in real time: 
+
+- First, I installed smoothie.js:
+```
+npm install smoothie
+```
+- Second, after creating **`index.html`** i added the following code:
+```HTML
+<!DOCTYPE html><html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <title>Analytics</title>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/smoothie/1.34.0/smoothie.min.js"></script>
+</head>
+<body>
+<canvas id="chart" width="600" height="400"></canvas>
+<script>
+   var index = -1;
+   randomColor = function () {
+       ++index;
+       if (index >= colors.length) index = 0;
+       return colors[index];
+   }
+   var pages = ["PAID", "PENDING"];
+   var colors = [
+       {sroke: 'rgba(0, 255, 0, 1)', fill: 'rgba(0, 255, 0, 0.2)'},
+       {sroke: 'rgba(255, 0, 0, 1)', fill: 'rgba(255, 0, 0, 0.2)'
+       }];
+   var courbe = [];
+   var smoothieChart = new SmoothieChart({tooltip: true});
+   smoothieChart.streamTo(document.getElementById("chart"), 500);
+   pages.forEach(function (v) {
+       courbe[v] = new TimeSeries();
+       col = randomColor();
+       smoothieChart.addTimeSeries(courbe[v], {strokeStyle: col.sroke, fillStyle: col.fill, lineWidth: 2});
+   });
+   var stockEventSource = new EventSource("/analytics");
+   stockEventSource.addEventListener("message", function (event) {
+       pages.forEach(function (v) {
+           val = JSON.parse(event.data)[v];
+           courbe[v].append(new Date().getTime(), val);
+       });
+   });
+</script>
+</body>
+</html>
+```
+- This resulted in:
+
+![image](https://user-images.githubusercontent.com/84817425/213911590-d1c50db1-1732-4332-9a76-8c8394c0b045.png)
