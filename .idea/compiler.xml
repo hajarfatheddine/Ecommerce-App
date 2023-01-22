@@ -8,10 +8,11 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="inventory-service" />
-        <module name="eureka-discovery" />
+        <module name="data-analytics-stream" />
         <module name="customer-service" />
-        <module name="billing-supplier-service" />
         <module name="gateway-service" />
+        <module name="eureka-discovery" />
+        <module name="billing-supplier-service" />
         <module name="billing-service" />
       </profile>
     </annotationProcessing>
@@ -20,6 +21,7 @@
       <module name="billing-supplier-service" target="17" />
       <module name="customer" target="17" />
       <module name="customer-service" target="17" />
+      <module name="data-analytics-stream" target="17" />
       <module name="eureka-discovery" target="17" />
       <module name="gateway-service" target="17" />
       <module name="inventory-service" target="17" />
@@ -31,6 +33,7 @@
       <module name="billing-supplier-service" options="-parameters" />
       <module name="customer" options="-parameters" />
       <module name="customer-service" options="-parameters" />
+      <module name="data-analytics-stream" options="-parameters" />
       <module name="eureka-discovery" options="-parameters" />
       <module name="gateway-service" options="-parameters" />
       <module name="inventory-service" options="-parameters" />

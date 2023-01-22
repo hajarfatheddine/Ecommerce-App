@@ -1,5 +1,4 @@
-package com.billing.billingsupplierservice.models;
-
+package com.example.dataanalyticsstream.models;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;

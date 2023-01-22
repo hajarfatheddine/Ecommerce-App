@@ -1,7 +1,8 @@
-package com.billing.billingsupplierservice.models;
+package com.example.dataanalyticsstream.models;
 
 
-import com.billing.billingsupplierservice.enums.BillStatus;
+
+import com.example.dataanalyticsstream.enums.BillStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,4 +24,3 @@ public class Bill {
     private Collection<ProductItem> productItems;
 
 }
-

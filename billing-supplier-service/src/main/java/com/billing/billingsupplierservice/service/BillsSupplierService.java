@@ -2,8 +2,8 @@ package com.billing.billingsupplierservice.service;
 
 
 import com.billing.billingsupplierservice.enums.BillStatus;
-import com.billing.billingsupplierservice.models.Bill;
-import com.billing.billingsupplierservice.models.ProductItem;
+import com.billing.billingsupplierservice.entities.Bill;
+import com.billing.billingsupplierservice.entities.ProductItem;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
